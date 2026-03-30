@@ -1,8 +1,9 @@
 import { parse, deserializeTs, deserialize, fastDeserialize } from "cue-ts";
+import type { z } from "zod";
 import { decodeMsgpack } from "./msgpack";
 
 export interface BenchmarkResult {
-	format: "cue" | "cue-deserialize-ts" | "cue-deserialize-wasm" | "cue-fast-deserialize" | "msgpack" | "json";
+	format: "cue" | "cue-deserialize-ts" | "cue-deserialize-wasm" | "cue-fast-deserialize" | "msgpack" | "json" | "json-zod" | "msgpack-zod";
 	iterations: number;
 	median: number;
 	mean: number;
@@ -137,4 +138,30 @@ export async function runCueDeserializeWasmBenchmark(cueText: string, iterations
 	const times = await runBatched(() => deserialize(cueText, { engine: "wasm" }), iterations);
 
 	return { format: "cue-deserialize-wasm", iterations, payloadBytes, ...calculateStats(times) };
+}
+
+export async function runJsonZodBenchmark(jsonString: string, zodSchema: z.ZodType, iterations: number): Promise<BenchmarkResult> {
+	const payloadBytes = new TextEncoder().encode(jsonString).byteLength;
+
+	// Warm up
+	for (let i = 0; i < WARMUP_ITERATIONS; i++) {
+		zodSchema.parse(JSON.parse(jsonString));
+	}
+
+	const times = await runBatched(() => zodSchema.parse(JSON.parse(jsonString)), iterations);
+
+	return { format: "json-zod", iterations, payloadBytes, ...calculateStats(times) };
+}
+
+export async function runMsgpackZodBenchmark(msgpackData: Uint8Array, zodSchema: z.ZodType, iterations: number): Promise<BenchmarkResult> {
+	const payloadBytes = msgpackData.byteLength;
+
+	// Warm up
+	for (let i = 0; i < WARMUP_ITERATIONS; i++) {
+		zodSchema.parse(decodeMsgpack(msgpackData));
+	}
+
+	const times = await runBatched(() => zodSchema.parse(decodeMsgpack(msgpackData)), iterations);
+
+	return { format: "msgpack-zod", iterations, payloadBytes, ...calculateStats(times) };
 }

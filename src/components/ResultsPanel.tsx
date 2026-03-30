@@ -9,6 +9,8 @@ interface ResultsPanelProps {
 	cueFastDeserializeResult?: BenchmarkResult;
 	cueDeserializeWasmResult?: BenchmarkResult;
 	msgpackResult?: BenchmarkResult;
+	jsonZodResult?: BenchmarkResult;
+	msgpackZodResult?: BenchmarkResult;
 	jsonOutput?: unknown;
 	cueParseOutput?: unknown;
 	cueDeserializeTsOutput?: unknown;
@@ -126,6 +128,8 @@ export function ResultsPanel({
 	cueFastDeserializeResult,
 	cueDeserializeWasmResult,
 	msgpackResult,
+	jsonZodResult,
+	msgpackZodResult,
 	jsonOutput,
 	cueParseOutput,
 	cueDeserializeTsOutput,
@@ -135,7 +139,7 @@ export function ResultsPanel({
 }: ResultsPanelProps) {
 	const [showOutput, setShowOutput] = useState(false);
 
-	const hasAnyResult = jsonResult || cueParseResult || cueDeserializeTsResult || cueFastDeserializeResult || cueDeserializeWasmResult || msgpackResult;
+	const hasAnyResult = jsonResult || cueParseResult || cueDeserializeTsResult || cueFastDeserializeResult || cueDeserializeWasmResult || msgpackResult || jsonZodResult || msgpackZodResult;
 
 	if (!hasAnyResult) {
 		return (
@@ -153,6 +157,8 @@ export function ResultsPanel({
 	if (cueFastDeserializeResult) entries.push({ key: "cueFastDeserialize", label: "CUE Fast Deserialize", result: cueFastDeserializeResult });
 	if (cueDeserializeWasmResult) entries.push({ key: "cueDeserializeWasm", label: "CUE Deserialize (WASM)", result: cueDeserializeWasmResult });
 	if (msgpackResult) entries.push({ key: "msgpack", label: "MsgPack Decode", result: msgpackResult });
+	if (jsonZodResult) entries.push({ key: "jsonZod", label: "JSON + Zod", result: jsonZodResult });
+	if (msgpackZodResult) entries.push({ key: "msgpackZod", label: "MsgPack + Zod", result: msgpackZodResult });
 
 	const ranks = rankResults(entries);
 

@@ -8,7 +8,9 @@ import {
 	runCueFastDeserializeBenchmark,
 	runCueDeserializeWasmBenchmark,
 	runJsonBenchmark,
+	runJsonZodBenchmark,
 	runMsgpackBenchmark,
+	runMsgpackZodBenchmark,
 } from "./benchmark/runner";
 import type { BenchmarkResult } from "./benchmark/runner";
 import { BenchmarkRunner } from "./components/BenchmarkRunner";
@@ -28,6 +30,8 @@ export default function App() {
 	const [cueFastDeserializeResult, setCueFastDeserializeResult] = useState<BenchmarkResult>();
 	const [cueDeserializeWasmResult, setCueDeserializeWasmResult] = useState<BenchmarkResult>();
 	const [msgpackResult, setMsgpackResult] = useState<BenchmarkResult>();
+	const [jsonZodResult, setJsonZodResult] = useState<BenchmarkResult>();
+	const [msgpackZodResult, setMsgpackZodResult] = useState<BenchmarkResult>();
 	const [jsonOutput, setJsonOutput] = useState<unknown>();
 	const [cueParseOutput, setCueParseOutput] = useState<unknown>();
 	const [cueDeserializeTsOutput, setCueDeserializeTsOutput] = useState<unknown>();
@@ -62,32 +66,37 @@ export default function App() {
 			setError(null);
 
 			try {
-				// Run all benchmarks sequentially to avoid interference
+				// Run all benchmarks sequentially — each wrapped so one failure doesn't block others
 				const jsonRes = await runJsonBenchmark(selectedExample.jsonText, iters);
-				const cueParseRes = await runCueBenchmark(cueText, iters);
-				const cueDeserializeTsRes = await runCueDeserializeTsBenchmark(cueText, iters);
-				const cueFastDeserializeRes = await runCueFastDeserializeBenchmark(cueText, iters);
-				const cueDeserializeWasmRes = wasmReady
-					? await runCueDeserializeWasmBenchmark(cueText, iters)
-					: undefined;
-				const msgpackRes = await runMsgpackBenchmark(selectedExample.msgpackData, iters);
-
 				setJsonResult(jsonRes);
-				setCueParseResult(cueParseRes);
-				setCueDeserializeTsResult(cueDeserializeTsRes);
-				setCueFastDeserializeResult(cueFastDeserializeRes);
-				setCueDeserializeWasmResult(cueDeserializeWasmRes);
+
+				try { const r = await runCueBenchmark(cueText, iters); setCueParseResult(r); } catch { setCueParseResult(undefined); }
+				try { const r = await runCueDeserializeTsBenchmark(cueText, iters); setCueDeserializeTsResult(r); } catch { setCueDeserializeTsResult(undefined); }
+				try { const r = await runCueFastDeserializeBenchmark(cueText, iters); setCueFastDeserializeResult(r); } catch { setCueFastDeserializeResult(undefined); }
+				try {
+					const r = wasmReady ? await runCueDeserializeWasmBenchmark(cueText, iters) : undefined;
+					setCueDeserializeWasmResult(r);
+				} catch { setCueDeserializeWasmResult(undefined); }
+
+				const msgpackRes = await runMsgpackBenchmark(selectedExample.msgpackData, iters);
 				setMsgpackResult(msgpackRes);
 
-				// Capture parsed outputs for display
-				setJsonOutput(JSON.parse(selectedExample.jsonText));
-				setCueParseOutput(parse(cueText));
-				setCueDeserializeTsOutput(deserializeTs(cueText));
-				setCueFastDeserializeOutput(fastDeserialize(cueText));
-				setCueDeserializeWasmOutput(
-					wasmReady ? deserialize(cueText, { engine: "wasm" }) : undefined,
-				);
-				setMsgpackOutput(decodeMsgpack(selectedExample.msgpackData));
+				// Zod validation benchmarks (only for schema examples)
+				if (selectedExample.zodSchema) {
+					try { const r = await runJsonZodBenchmark(selectedExample.jsonText, selectedExample.zodSchema, iters); setJsonZodResult(r); } catch { setJsonZodResult(undefined); }
+					try { const r = await runMsgpackZodBenchmark(selectedExample.msgpackData, selectedExample.zodSchema, iters); setMsgpackZodResult(r); } catch { setMsgpackZodResult(undefined); }
+				} else {
+					setJsonZodResult(undefined);
+					setMsgpackZodResult(undefined);
+				}
+
+				// Capture parsed outputs for display (each independent so one failure doesn't block others)
+				try { setJsonOutput(JSON.parse(selectedExample.jsonText)); } catch { /* skip */ }
+				try { setCueParseOutput(parse(cueText)); } catch { /* skip */ }
+				try { setCueDeserializeTsOutput(deserializeTs(cueText)); } catch { /* skip */ }
+				try { setCueFastDeserializeOutput(fastDeserialize(cueText)); } catch { /* skip */ }
+				try { setCueDeserializeWasmOutput(wasmReady ? deserialize(cueText, { engine: "wasm" }) : undefined); } catch { /* skip */ }
+				try { setMsgpackOutput(decodeMsgpack(selectedExample.msgpackData)); } catch { /* skip */ }
 			} catch (err) {
 				setError(err instanceof Error ? err.message : String(err));
 			} finally {
@@ -104,6 +113,8 @@ export default function App() {
 		setCueFastDeserializeResult(undefined);
 		setCueDeserializeWasmResult(undefined);
 		setMsgpackResult(undefined);
+		setJsonZodResult(undefined);
+		setMsgpackZodResult(undefined);
 		setJsonOutput(undefined);
 		setCueParseOutput(undefined);
 		setCueDeserializeTsOutput(undefined);
@@ -164,6 +175,8 @@ export default function App() {
 						cueFastDeserializeResult={cueFastDeserializeResult}
 						cueDeserializeWasmResult={cueDeserializeWasmResult}
 						msgpackResult={msgpackResult}
+						jsonZodResult={jsonZodResult}
+						msgpackZodResult={msgpackZodResult}
 						jsonOutput={jsonOutput}
 						cueParseOutput={cueParseOutput}
 						cueDeserializeTsOutput={cueDeserializeTsOutput}
