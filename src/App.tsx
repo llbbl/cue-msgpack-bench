@@ -7,8 +7,11 @@ import {
 	runCueDeserializeTsBenchmark,
 	runCueFastDeserializeBenchmark,
 	runCueDeserializeWasmBenchmark,
+	runCueCompiledBenchmark,
 	runJsonBenchmark,
 	runJsonZodBenchmark,
+	runJsonAjvCompiledBenchmark,
+	runJsonAjvInterpretBenchmark,
 	runMsgpackBenchmark,
 	runMsgpackZodBenchmark,
 } from "./benchmark/runner";
@@ -32,6 +35,9 @@ export default function App() {
 	const [msgpackResult, setMsgpackResult] = useState<BenchmarkResult>();
 	const [jsonZodResult, setJsonZodResult] = useState<BenchmarkResult>();
 	const [msgpackZodResult, setMsgpackZodResult] = useState<BenchmarkResult>();
+	const [jsonAjvCompiledResult, setJsonAjvCompiledResult] = useState<BenchmarkResult>();
+	const [jsonAjvInterpretResult, setJsonAjvInterpretResult] = useState<BenchmarkResult>();
+	const [cueCompiledResult, setCueCompiledResult] = useState<BenchmarkResult>();
 	const [jsonOutput, setJsonOutput] = useState<unknown>();
 	const [cueParseOutput, setCueParseOutput] = useState<unknown>();
 	const [cueDeserializeTsOutput, setCueDeserializeTsOutput] = useState<unknown>();
@@ -78,6 +84,13 @@ export default function App() {
 					setCueDeserializeWasmResult(r);
 				} catch { setCueDeserializeWasmResult(undefined); }
 
+				// CUE compiled schema benchmark (only for schema examples)
+				if (selectedExample.zodSchema) {
+					try { const r = await runCueCompiledBenchmark(cueText, iters); setCueCompiledResult(r); } catch { setCueCompiledResult(undefined); }
+				} else {
+					setCueCompiledResult(undefined);
+				}
+
 				const msgpackRes = await runMsgpackBenchmark(selectedExample.msgpackData, iters);
 				setMsgpackResult(msgpackRes);
 
@@ -88,6 +101,15 @@ export default function App() {
 				} else {
 					setJsonZodResult(undefined);
 					setMsgpackZodResult(undefined);
+				}
+
+				// Ajv validation benchmarks (only for schema examples)
+				if (selectedExample.ajvSchema) {
+					try { const r = await runJsonAjvCompiledBenchmark(selectedExample.jsonText, selectedExample.ajvSchema, iters); setJsonAjvCompiledResult(r); } catch { setJsonAjvCompiledResult(undefined); }
+					try { const r = await runJsonAjvInterpretBenchmark(selectedExample.jsonText, selectedExample.ajvSchema, iters); setJsonAjvInterpretResult(r); } catch { setJsonAjvInterpretResult(undefined); }
+				} else {
+					setJsonAjvCompiledResult(undefined);
+					setJsonAjvInterpretResult(undefined);
 				}
 
 				// Capture parsed outputs for display (each independent so one failure doesn't block others)
@@ -115,6 +137,9 @@ export default function App() {
 		setMsgpackResult(undefined);
 		setJsonZodResult(undefined);
 		setMsgpackZodResult(undefined);
+		setJsonAjvCompiledResult(undefined);
+		setJsonAjvInterpretResult(undefined);
+		setCueCompiledResult(undefined);
 		setJsonOutput(undefined);
 		setCueParseOutput(undefined);
 		setCueDeserializeTsOutput(undefined);
@@ -177,6 +202,9 @@ export default function App() {
 						msgpackResult={msgpackResult}
 						jsonZodResult={jsonZodResult}
 						msgpackZodResult={msgpackZodResult}
+						jsonAjvCompiledResult={jsonAjvCompiledResult}
+						jsonAjvInterpretResult={jsonAjvInterpretResult}
+						cueCompiledResult={cueCompiledResult}
 						jsonOutput={jsonOutput}
 						cueParseOutput={cueParseOutput}
 						cueDeserializeTsOutput={cueDeserializeTsOutput}

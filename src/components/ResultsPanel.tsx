@@ -11,6 +11,9 @@ interface ResultsPanelProps {
 	msgpackResult?: BenchmarkResult;
 	jsonZodResult?: BenchmarkResult;
 	msgpackZodResult?: BenchmarkResult;
+	jsonAjvCompiledResult?: BenchmarkResult;
+	jsonAjvInterpretResult?: BenchmarkResult;
+	cueCompiledResult?: BenchmarkResult;
 	jsonOutput?: unknown;
 	cueParseOutput?: unknown;
 	cueDeserializeTsOutput?: unknown;
@@ -130,6 +133,9 @@ export function ResultsPanel({
 	msgpackResult,
 	jsonZodResult,
 	msgpackZodResult,
+	jsonAjvCompiledResult,
+	jsonAjvInterpretResult,
+	cueCompiledResult,
 	jsonOutput,
 	cueParseOutput,
 	cueDeserializeTsOutput,
@@ -139,7 +145,7 @@ export function ResultsPanel({
 }: ResultsPanelProps) {
 	const [showOutput, setShowOutput] = useState(false);
 
-	const hasAnyResult = jsonResult || cueParseResult || cueDeserializeTsResult || cueFastDeserializeResult || cueDeserializeWasmResult || msgpackResult || jsonZodResult || msgpackZodResult;
+	const hasAnyResult = jsonResult || cueParseResult || cueDeserializeTsResult || cueFastDeserializeResult || cueDeserializeWasmResult || cueCompiledResult || msgpackResult || jsonZodResult || msgpackZodResult || jsonAjvCompiledResult || jsonAjvInterpretResult;
 
 	if (!hasAnyResult) {
 		return (
@@ -159,6 +165,9 @@ export function ResultsPanel({
 	if (msgpackResult) entries.push({ key: "msgpack", label: "MsgPack Decode", result: msgpackResult });
 	if (jsonZodResult) entries.push({ key: "jsonZod", label: "JSON + Zod", result: jsonZodResult });
 	if (msgpackZodResult) entries.push({ key: "msgpackZod", label: "MsgPack + Zod", result: msgpackZodResult });
+	if (jsonAjvCompiledResult) entries.push({ key: "jsonAjvCompiled", label: "JSON + Ajv (compiled)", result: jsonAjvCompiledResult });
+	if (cueCompiledResult) entries.push({ key: "cueCompiled", label: "CUE (compiled schema)", result: cueCompiledResult });
+	if (jsonAjvInterpretResult) entries.push({ key: "jsonAjvInterpret", label: "JSON + Ajv (interpret)", result: jsonAjvInterpretResult });
 
 	const ranks = rankResults(entries);
 

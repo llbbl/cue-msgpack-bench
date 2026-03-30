@@ -1,9 +1,11 @@
-import { parse, deserializeTs, deserialize, fastDeserialize } from "cue-ts";
+import { parse, deserializeTs, deserialize, fastDeserialize, compileSchema, stripDefinitions } from "cue-ts";
 import type { z } from "zod";
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
 import { decodeMsgpack } from "./msgpack";
 
 export interface BenchmarkResult {
-	format: "cue" | "cue-deserialize-ts" | "cue-deserialize-wasm" | "cue-fast-deserialize" | "msgpack" | "json" | "json-zod" | "msgpack-zod";
+	format: "cue" | "cue-deserialize-ts" | "cue-deserialize-wasm" | "cue-fast-deserialize" | "cue-compiled" | "msgpack" | "json" | "json-zod" | "msgpack-zod" | "json-ajv-compiled" | "json-ajv-interpret";
 	iterations: number;
 	median: number;
 	mean: number;
@@ -164,4 +166,63 @@ export async function runMsgpackZodBenchmark(msgpackData: Uint8Array, zodSchema:
 	const times = await runBatched(() => zodSchema.parse(decodeMsgpack(msgpackData)), iterations);
 
 	return { format: "msgpack-zod", iterations, payloadBytes, ...calculateStats(times) };
+}
+
+export async function runJsonAjvCompiledBenchmark(jsonString: string, schema: Record<string, unknown>, iterations: number): Promise<BenchmarkResult> {
+	const payloadBytes = new TextEncoder().encode(jsonString).byteLength;
+
+	// Compile schema ONCE before benchmark
+	const ajv = new Ajv({ allErrors: true });
+	addFormats(ajv);
+	const validate = ajv.compile(schema);
+
+	// Warm up
+	for (let i = 0; i < WARMUP_ITERATIONS; i++) {
+		validate(JSON.parse(jsonString));
+	}
+
+	const times = await runBatched(() => validate(JSON.parse(jsonString)), iterations);
+
+	return { format: "json-ajv-compiled", iterations, payloadBytes, ...calculateStats(times) };
+}
+
+export async function runJsonAjvInterpretBenchmark(jsonString: string, schema: Record<string, unknown>, iterations: number): Promise<BenchmarkResult> {
+	const payloadBytes = new TextEncoder().encode(jsonString).byteLength;
+
+	// Warm up
+	for (let i = 0; i < WARMUP_ITERATIONS; i++) {
+		const ajv = new Ajv({ allErrors: true });
+		addFormats(ajv);
+		const validate = ajv.compile(schema);
+		validate(JSON.parse(jsonString));
+	}
+
+	const times = await runBatched(() => {
+		const ajv = new Ajv({ allErrors: true });
+		addFormats(ajv);
+		const validate = ajv.compile(schema);
+		validate(JSON.parse(jsonString));
+	}, iterations);
+
+	return { format: "json-ajv-interpret", iterations, payloadBytes, ...calculateStats(times) };
+}
+
+export async function runCueCompiledBenchmark(cueText: string, iterations: number): Promise<BenchmarkResult> {
+	// Pre-compile schema AND strip definitions ONCE (not timed)
+	const validator = compileSchema(cueText);
+	const dataOnlyText = stripDefinitions(cueText);
+	const payloadBytes = new TextEncoder().encode(dataOnlyText).byteLength;
+
+	// Warm up
+	for (let i = 0; i < WARMUP_ITERATIONS; i++) {
+		const data = fastDeserialize(dataOnlyText);
+		validator.validate(data);
+	}
+
+	const times = await runBatched(() => {
+		const data = fastDeserialize(dataOnlyText);
+		validator.validate(data);
+	}, iterations);
+
+	return { format: "cue-compiled", iterations, payloadBytes, ...calculateStats(times) };
 }

@@ -28,6 +28,8 @@ import schemaAppConfigJson from "./examples/schema-app-config.json?raw";
 import schemaAppConfigMsgpack from "./examples/schema-app-config.msgpack.ts";
 import { schema as schemaUserApiZod } from "./schemas/schema-user-api.schema";
 import { schema as schemaAppConfigZod } from "./schemas/schema-app-config.schema";
+import { jsonSchema as schemaUserApiAjv } from "./schemas/schema-user-api.json-schema";
+import { jsonSchema as schemaAppConfigAjv } from "./schemas/schema-app-config.json-schema";
 
 export interface Example {
 	id: string;
@@ -36,6 +38,7 @@ export interface Example {
 	jsonText: string;
 	msgpackData: Uint8Array;
 	zodSchema?: z.ZodType;
+	ajvSchema?: Record<string, unknown>;
 }
 
 export const examples: Example[] = [
@@ -46,6 +49,6 @@ export const examples: Example[] = [
 	{ id: "order-history", name: "E-commerce Order History", cueText: orderHistoryCue, jsonText: orderHistoryJson, msgpackData: orderHistoryMsgpack },
 	{ id: "large-product-catalog", name: "Large Product Catalog (100 products)", cueText: largeProductCatalogCue, jsonText: largeProductCatalogJson, msgpackData: largeProductCatalogMsgpack },
 	{ id: "large-analytics", name: "Large Analytics (365 days)", cueText: largeAnalyticsCue, jsonText: largeAnalyticsJson, msgpackData: largeAnalyticsMsgpack },
-	{ id: "schema-user-api", name: "User Management API (Schema+Data)", cueText: schemaUserApiCue, jsonText: schemaUserApiJson, msgpackData: schemaUserApiMsgpack, zodSchema: schemaUserApiZod },
-	{ id: "schema-app-config", name: "App Config (Schema+Data)", cueText: schemaAppConfigCue, jsonText: schemaAppConfigJson, msgpackData: schemaAppConfigMsgpack, zodSchema: schemaAppConfigZod },
+	{ id: "schema-user-api", name: "User Management API (Schema+Data)", cueText: schemaUserApiCue, jsonText: schemaUserApiJson, msgpackData: schemaUserApiMsgpack, zodSchema: schemaUserApiZod, ajvSchema: schemaUserApiAjv },
+	{ id: "schema-app-config", name: "App Config (Schema+Data)", cueText: schemaAppConfigCue, jsonText: schemaAppConfigJson, msgpackData: schemaAppConfigMsgpack, zodSchema: schemaAppConfigZod, ajvSchema: schemaAppConfigAjv },
 ];

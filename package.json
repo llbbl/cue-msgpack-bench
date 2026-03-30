@@ -14,6 +14,8 @@
 	},
 	"dependencies": {
 		"@msgpack/msgpack": "^3.0.0-beta.3",
+		"ajv": "^8.18.0",
+		"ajv-formats": "^3.0.1",
 		"cue-ts": "link:../cue-ts",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
