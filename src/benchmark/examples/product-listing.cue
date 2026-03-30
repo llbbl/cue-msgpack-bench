@@ -1,0 +1,233 @@
+products: [{
+  id: "prod_001"
+  name: "Ergonomic Mesh Office Chair"
+  description: "Premium ergonomic office chair with breathable mesh back, adjustable lumbar support, and 4D armrests. Designed for all-day comfort during long work sessions."
+  price: 449.99
+  compareAtPrice: 599.99
+  currency: "USD"
+  images: ["https://cdn.example.com/products/chair-001-front.jpg", "https://cdn.example.com/products/chair-001-side.jpg", "https://cdn.example.com/products/chair-001-back.jpg"]
+  category: "furniture"
+  tags: ["ergonomic", "office", "mesh", "adjustable"]
+  rating: {
+    average: 4.7
+    count: 2341
+  }
+  inventory: {
+    inStock: true
+    quantity: 156
+  }
+  variants: [{
+    size: "standard"
+    color: "graphite"
+    sku: "CHAIR-001-STD-GRA"
+    price: 449.99
+  }, {
+    size: "tall"
+    color: "midnight blue"
+    sku: "CHAIR-001-TLL-BLU"
+    price: 499.99
+  }]
+}, {
+  id: "prod_002"
+  name: "Mechanical Keyboard TKL"
+  description: "Tenkeyless mechanical keyboard with hot-swappable switches, RGB backlighting, and PBT double-shot keycaps. Compatible with Windows and macOS."
+  price: 129.99
+  compareAtPrice: 159.99
+  currency: "USD"
+  images: ["https://cdn.example.com/products/kb-002-top.jpg", "https://cdn.example.com/products/kb-002-angle.jpg", "https://cdn.example.com/products/kb-002-rgb.jpg"]
+  category: "peripherals"
+  tags: ["keyboard", "mechanical", "rgb", "hot-swap"]
+  rating: {
+    average: 4.5
+    count: 876
+  }
+  inventory: {
+    inStock: true
+    quantity: 423
+  }
+  variants: [{
+    size: "tkl"
+    color: "black"
+    sku: "KB-002-TKL-BLK"
+    price: 129.99
+  }, {
+    size: "tkl"
+    color: "white"
+    sku: "KB-002-TKL-WHT"
+    price: 129.99
+  }]
+}, {
+  id: "prod_003"
+  name: "Ultra-Wide Curved Monitor 34\""
+  description: "34-inch ultra-wide curved monitor with WQHD resolution, 144Hz refresh rate, and 1ms response time. Perfect for productivity and gaming alike."
+  price: 699.99
+  compareAtPrice: 849.99
+  currency: "USD"
+  images: ["https://cdn.example.com/products/mon-003-front.jpg", "https://cdn.example.com/products/mon-003-side.jpg", "https://cdn.example.com/products/mon-003-ports.jpg"]
+  category: "monitors"
+  tags: ["ultrawide", "curved", "144hz"]
+  rating: {
+    average: 4.8
+    count: 1205
+  }
+  inventory: {
+    inStock: true
+    quantity: 67
+  }
+  variants: [{
+    size: "34-inch"
+    color: "silver"
+    sku: "MON-003-34-SLV"
+    price: 699.99
+  }, {
+    size: "34-inch"
+    color: "black"
+    sku: "MON-003-34-BLK"
+    price: 699.99
+  }]
+}, {
+  id: "prod_004"
+  name: "Noise-Cancelling Headphones Pro"
+  description: "Premium wireless headphones with adaptive noise cancellation, 30-hour battery life, and multipoint Bluetooth connectivity. Includes carrying case and audio cable."
+  price: 349.99
+  compareAtPrice: 399.99
+  currency: "USD"
+  images: ["https://cdn.example.com/products/hp-004-main.jpg", "https://cdn.example.com/products/hp-004-folded.jpg", "https://cdn.example.com/products/hp-004-case.jpg"]
+  category: "audio"
+  tags: ["headphones", "noise-cancelling", "wireless", "bluetooth"]
+  rating: {
+    average: 4.6
+    count: 3102
+  }
+  inventory: {
+    inStock: true
+    quantity: 289
+  }
+  variants: [{
+    size: "one-size"
+    color: "midnight black"
+    sku: "HP-004-OS-BLK"
+    price: 349.99
+  }, {
+    size: "one-size"
+    color: "silver white"
+    sku: "HP-004-OS-WHT"
+    price: 349.99
+  }]
+}, {
+  id: "prod_005"
+  name: "Standing Desk Converter"
+  description: "Height-adjustable standing desk converter with gas spring mechanism. Features a spacious 36-inch work surface and integrated cable management."
+  price: 279.99
+  compareAtPrice: 349.99
+  currency: "USD"
+  images: ["https://cdn.example.com/products/desk-005-up.jpg", "https://cdn.example.com/products/desk-005-down.jpg", "https://cdn.example.com/products/desk-005-detail.jpg"]
+  category: "furniture"
+  tags: ["standing-desk", "ergonomic", "adjustable"]
+  rating: {
+    average: 4.3
+    count: 567
+  }
+  inventory: {
+    inStock: true
+    quantity: 94
+  }
+  variants: [{
+    size: "36-inch"
+    color: "black"
+    sku: "DESK-005-36-BLK"
+    price: 279.99
+  }, {
+    size: "36-inch"
+    color: "walnut"
+    sku: "DESK-005-36-WAL"
+    price: 299.99
+  }]
+}, {
+  id: "prod_006"
+  name: "Webcam 4K Pro"
+  description: "4K webcam with auto-focus, built-in ring light, and AI-powered framing. Ideal for video calls, streaming, and content creation."
+  price: 179.99
+  compareAtPrice: 219.99
+  currency: "USD"
+  images: ["https://cdn.example.com/products/cam-006-front.jpg", "https://cdn.example.com/products/cam-006-mounted.jpg", "https://cdn.example.com/products/cam-006-light.jpg"]
+  category: "peripherals"
+  tags: ["webcam", "4k", "streaming"]
+  rating: {
+    average: 4.4
+    count: 743
+  }
+  inventory: {
+    inStock: false
+    quantity: 0
+  }
+  variants: [{
+    size: "standard"
+    color: "black"
+    sku: "CAM-006-STD-BLK"
+    price: 179.99
+  }, {
+    size: "standard"
+    color: "white"
+    sku: "CAM-006-STD-WHT"
+    price: 179.99
+  }]
+}, {
+  id: "prod_007"
+  name: "USB-C Docking Station"
+  description: "Universal USB-C docking station with dual 4K HDMI, 10Gbps data ports, and 100W power delivery. Compatible with all major laptop brands."
+  price: 199.99
+  compareAtPrice: 249.99
+  currency: "USD"
+  images: ["https://cdn.example.com/products/dock-007-top.jpg", "https://cdn.example.com/products/dock-007-ports.jpg", "https://cdn.example.com/products/dock-007-setup.jpg"]
+  category: "accessories"
+  tags: ["docking-station", "usb-c", "thunderbolt"]
+  rating: {
+    average: 4.2
+    count: 412
+  }
+  inventory: {
+    inStock: true
+    quantity: 178
+  }
+  variants: [{
+    size: "standard"
+    color: "space gray"
+    sku: "DOCK-007-STD-GRY"
+    price: 199.99
+  }, {
+    size: "standard"
+    color: "silver"
+    sku: "DOCK-007-STD-SLV"
+    price: 199.99
+  }]
+}, {
+  id: "prod_008"
+  name: "Wireless Mouse Ergonomic"
+  description: "Ergonomic vertical wireless mouse with adjustable DPI, silent clicks, and rechargeable battery. Reduces wrist strain during extended use."
+  price: 59.99
+  compareAtPrice: 79.99
+  currency: "USD"
+  images: ["https://cdn.example.com/products/mouse-008-side.jpg", "https://cdn.example.com/products/mouse-008-top.jpg", "https://cdn.example.com/products/mouse-008-grip.jpg"]
+  category: "peripherals"
+  tags: ["mouse", "ergonomic", "wireless", "vertical"]
+  rating: {
+    average: 4.1
+    count: 1890
+  }
+  inventory: {
+    inStock: true
+    quantity: 612
+  }
+  variants: [{
+    size: "medium"
+    color: "black"
+    sku: "MOUSE-008-MED-BLK"
+    price: 59.99
+  }, {
+    size: "large"
+    color: "black"
+    sku: "MOUSE-008-LRG-BLK"
+    price: 64.99
+  }]
+}]

@@ -1,0 +1,51 @@
+id: "usr_2xK9mP3qR7"
+username: "sarah_chen"
+email: "sarah.chen@example.com"
+displayName: "Sarah Chen"
+avatar: "https://api.example.com/avatars/usr_2xK9mP3qR7.jpg"
+bio: "Full-stack developer passionate about distributed systems and open source."
+verified: true
+createdAt: "2023-01-15T08:30:00Z"
+lastLoginAt: "2024-03-28T14:22:00Z"
+role: "admin"
+address: {
+  street: "742 Evergreen Terrace"
+  city: "Portland"
+  state: "OR"
+  zip: "97201"
+  country: "US"
+}
+preferences: {
+  theme: "dark"
+  language: "en"
+  timezone: "America/Los_Angeles"
+  notifications: {
+    email: true
+    push: true
+    sms: false
+  }
+  accessibility: {
+    reduceMotion: false
+    highContrast: false
+    fontSize: 16
+  }
+}
+social: {
+  github: "sarahchen"
+  twitter: "sarah_codes"
+  linkedin: "sarahchen-dev"
+  website: "https://sarahchen.dev"
+}
+subscription: {
+  plan: "pro"
+  status: "active"
+  billingCycle: "annual"
+  renewsAt: "2025-01-15T00:00:00Z"
+  features: ["advanced-analytics", "priority-support", "custom-domains", "api-access"]
+}
+stats: {
+  posts: 142
+  followers: 1583
+  following: 267
+  reputation: 4250
+}

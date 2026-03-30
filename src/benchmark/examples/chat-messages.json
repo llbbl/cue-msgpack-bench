@@ -1,0 +1,145 @@
+{
+	"messages": [
+		{
+			"id": "msg_001",
+			"sender": { "id": "usr_alice", "name": "Alice Martinez", "avatar": "https://api.example.com/avatars/alice.jpg", "status": "online" },
+			"content": "Hey team, I just pushed the new auth middleware. Can someone review the PR when they get a chance?",
+			"timestamp": "2024-03-28T09:15:00Z",
+			"edited": false,
+			"reactions": [
+				{ "emoji": "eyes", "users": ["usr_bob", "usr_charlie"], "count": 2 },
+				{ "emoji": "thumbsup", "users": ["usr_diana"], "count": 1 }
+			],
+			"attachments": [],
+			"threadReplies": 3,
+			"readBy": ["usr_bob", "usr_charlie", "usr_diana", "usr_eve"]
+		},
+		{
+			"id": "msg_002",
+			"sender": { "id": "usr_bob", "name": "Bob Thompson", "avatar": "https://api.example.com/avatars/bob.jpg", "status": "online" },
+			"content": "On it! I will take a look after standup. Which repo is it in?",
+			"timestamp": "2024-03-28T09:18:00Z",
+			"edited": false,
+			"reactions": [],
+			"attachments": [],
+			"threadReplies": 0,
+			"readBy": ["usr_alice", "usr_charlie", "usr_diana"]
+		},
+		{
+			"id": "msg_003",
+			"sender": { "id": "usr_alice", "name": "Alice Martinez", "avatar": "https://api.example.com/avatars/alice.jpg", "status": "online" },
+			"content": "It is in the main API repo, PR #247. I also updated the migration scripts.",
+			"timestamp": "2024-03-28T09:19:30Z",
+			"edited": true,
+			"reactions": [{ "emoji": "thankyou", "users": ["usr_bob"], "count": 1 }],
+			"attachments": [],
+			"threadReplies": 0,
+			"readBy": ["usr_bob", "usr_charlie", "usr_diana"]
+		},
+		{
+			"id": "msg_004",
+			"sender": { "id": "usr_charlie", "name": "Charlie Park", "avatar": "https://api.example.com/avatars/charlie.jpg", "status": "away" },
+			"content": "Heads up everyone, the staging environment will be down for maintenance from 2-3 PM today.",
+			"timestamp": "2024-03-28T09:25:00Z",
+			"edited": false,
+			"reactions": [{ "emoji": "noted", "users": ["usr_alice", "usr_bob", "usr_diana", "usr_eve"], "count": 4 }],
+			"attachments": [],
+			"threadReplies": 1,
+			"readBy": ["usr_alice", "usr_bob", "usr_diana", "usr_eve"]
+		},
+		{
+			"id": "msg_005",
+			"sender": { "id": "usr_diana", "name": "Diana Okafor", "avatar": "https://api.example.com/avatars/diana.jpg", "status": "online" },
+			"content": "I finished the dashboard redesign mockups. Sharing the Figma link and the exported assets.",
+			"timestamp": "2024-03-28T09:32:00Z",
+			"edited": false,
+			"reactions": [
+				{ "emoji": "fire", "users": ["usr_alice", "usr_charlie", "usr_eve"], "count": 3 },
+				{ "emoji": "heart", "users": ["usr_bob"], "count": 1 }
+			],
+			"attachments": [
+				{ "type": "link", "url": "https://figma.com/file/abc123/dashboard-v2", "name": "Dashboard V2 Mockups", "size": 0 },
+				{ "type": "image", "url": "https://cdn.example.com/uploads/dashboard-preview.png", "name": "dashboard-preview.png", "size": 245800 }
+			],
+			"threadReplies": 5,
+			"readBy": ["usr_alice", "usr_bob", "usr_charlie", "usr_eve"]
+		},
+		{
+			"id": "msg_006",
+			"sender": { "id": "usr_eve", "name": "Eve Richardson", "avatar": "https://api.example.com/avatars/eve.jpg", "status": "online" },
+			"content": "Those mockups look amazing, Diana! Quick question: are we keeping the sidebar navigation or switching to the top nav pattern?",
+			"timestamp": "2024-03-28T09:35:00Z",
+			"edited": false,
+			"reactions": [],
+			"attachments": [],
+			"threadReplies": 0,
+			"readBy": ["usr_alice", "usr_bob", "usr_diana"]
+		},
+		{
+			"id": "msg_007",
+			"sender": { "id": "usr_diana", "name": "Diana Okafor", "avatar": "https://api.example.com/avatars/diana.jpg", "status": "online" },
+			"content": "We are going with a collapsible sidebar. It works better for the analytics views where we need more horizontal space.",
+			"timestamp": "2024-03-28T09:37:00Z",
+			"edited": false,
+			"reactions": [{ "emoji": "thumbsup", "users": ["usr_eve", "usr_alice"], "count": 2 }],
+			"attachments": [],
+			"threadReplies": 0,
+			"readBy": ["usr_alice", "usr_bob", "usr_eve"]
+		},
+		{
+			"id": "msg_008",
+			"sender": { "id": "usr_bob", "name": "Bob Thompson", "avatar": "https://api.example.com/avatars/bob.jpg", "status": "online" },
+			"content": "Just reviewed Alice's PR. Left a few comments on the token refresh logic but overall looks solid. Approved with minor changes.",
+			"timestamp": "2024-03-28T10:05:00Z",
+			"edited": false,
+			"reactions": [{ "emoji": "tada", "users": ["usr_alice"], "count": 1 }],
+			"attachments": [],
+			"threadReplies": 2,
+			"readBy": ["usr_alice", "usr_charlie", "usr_diana"]
+		},
+		{
+			"id": "msg_009",
+			"sender": { "id": "usr_alice", "name": "Alice Martinez", "avatar": "https://api.example.com/avatars/alice.jpg", "status": "online" },
+			"content": "Thanks Bob! I will address those comments now. The token refresh edge case is a good catch.",
+			"timestamp": "2024-03-28T10:08:00Z",
+			"edited": false,
+			"reactions": [],
+			"attachments": [],
+			"threadReplies": 0,
+			"readBy": ["usr_bob", "usr_charlie", "usr_diana"]
+		},
+		{
+			"id": "msg_010",
+			"sender": { "id": "usr_charlie", "name": "Charlie Park", "avatar": "https://api.example.com/avatars/charlie.jpg", "status": "away" },
+			"content": "Sharing the updated API docs for the v2 endpoints. Please review before EOD.",
+			"timestamp": "2024-03-28T10:30:00Z",
+			"edited": false,
+			"reactions": [{ "emoji": "eyes", "users": ["usr_alice", "usr_bob", "usr_diana"], "count": 3 }],
+			"attachments": [{ "type": "document", "url": "https://cdn.example.com/uploads/api-docs-v2.pdf", "name": "api-docs-v2.pdf", "size": 1248000 }],
+			"threadReplies": 4,
+			"readBy": ["usr_alice", "usr_bob", "usr_diana", "usr_eve"]
+		},
+		{
+			"id": "msg_011",
+			"sender": { "id": "usr_eve", "name": "Eve Richardson", "avatar": "https://api.example.com/avatars/eve.jpg", "status": "online" },
+			"content": "The load tests for the new caching layer are done. We are seeing a 40% improvement in p95 latency. Full report attached.",
+			"timestamp": "2024-03-28T11:00:00Z",
+			"edited": true,
+			"reactions": [{ "emoji": "rocket", "users": ["usr_alice", "usr_bob", "usr_charlie", "usr_diana"], "count": 4 }],
+			"attachments": [{ "type": "document", "url": "https://cdn.example.com/uploads/load-test-report.xlsx", "name": "load-test-report.xlsx", "size": 89400 }],
+			"threadReplies": 6,
+			"readBy": ["usr_alice", "usr_bob", "usr_charlie", "usr_diana"]
+		},
+		{
+			"id": "msg_012",
+			"sender": { "id": "usr_bob", "name": "Bob Thompson", "avatar": "https://api.example.com/avatars/bob.jpg", "status": "online" },
+			"content": "Great numbers Eve! That should keep us well within our SLA targets. Let us plan the prod rollout for next week.",
+			"timestamp": "2024-03-28T11:05:00Z",
+			"edited": false,
+			"reactions": [{ "emoji": "thumbsup", "users": ["usr_eve", "usr_alice", "usr_charlie"], "count": 3 }],
+			"attachments": [],
+			"threadReplies": 0,
+			"readBy": ["usr_alice", "usr_charlie", "usr_diana", "usr_eve"]
+		}
+	]
+}
