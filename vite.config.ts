@@ -4,4 +4,12 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
 	plugins: [react(), tailwindcss()],
+	optimizeDeps: {
+		exclude: ["cue-ts"],
+	},
+	server: {
+		fs: {
+			allow: ["..", "../cue-ts"],
+		},
+	},
 });

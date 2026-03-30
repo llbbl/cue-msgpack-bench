@@ -4,23 +4,27 @@ import { formatBytes, formatMicroseconds, formatRatio } from "../lib/format";
 
 interface ResultsPanelProps {
 	jsonResult?: BenchmarkResult;
-	cueResult?: BenchmarkResult;
+	cueParseResult?: BenchmarkResult;
+	cueDeserializeTsResult?: BenchmarkResult;
+	cueDeserializeWasmResult?: BenchmarkResult;
 	msgpackResult?: BenchmarkResult;
 	jsonOutput?: unknown;
-	cueOutput?: unknown;
+	cueParseOutput?: unknown;
+	cueDeserializeTsOutput?: unknown;
+	cueDeserializeWasmOutput?: unknown;
 	msgpackOutput?: unknown;
 }
 
 function StatRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
 	return (
-		<div className="flex justify-between py-1">
+		<div className="flex justify-between py-0.5">
 			<span className="text-zinc-500">{label}</span>
 			<span className={highlight ? "font-semibold text-white" : "text-zinc-300"}>{value}</span>
 		</div>
 	);
 }
 
-type RankStatus = "fastest" | "middle" | "slowest";
+type RankStatus = "fastest" | "slowest" | "neutral";
 
 function ResultCard({
 	title,
@@ -30,73 +34,106 @@ function ResultCard({
 	const borderColor =
 		status === "fastest"
 			? "border-green-500/50"
-			: status === "middle"
-				? "border-yellow-500/30"
-				: "border-red-500/30";
+			: status === "slowest"
+				? "border-red-500/30"
+				: "border-zinc-700";
 	const badge =
 		status === "fastest" ? (
 			<span className="rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400">
 				Fastest
 			</span>
-		) : status === "middle" ? (
-			<span className="rounded-full bg-yellow-500/20 px-2 py-0.5 text-xs font-medium text-yellow-400">
-				Middle
-			</span>
-		) : (
+		) : status === "slowest" ? (
 			<span className="rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400">
 				Slowest
 			</span>
-		);
+		) : null;
 
 	return (
-		<div className={`rounded-lg border ${borderColor} bg-zinc-900 p-4`}>
-			<div className="mb-3 flex items-center justify-between">
-				<h3 className="text-sm font-semibold text-zinc-200">{title}</h3>
+		<div className={`rounded-lg border ${borderColor} bg-zinc-900 p-3`}>
+			<div className="mb-2 flex items-center justify-between gap-2">
+				<h3 className="text-xs font-semibold text-zinc-200 leading-tight">{title}</h3>
 				{badge}
 			</div>
-			<div className="space-y-0.5 text-sm">
+			<div className="space-y-0 text-xs">
 				<StatRow label="Median" value={formatMicroseconds(result.median)} highlight />
 				<StatRow label="Mean" value={formatMicroseconds(result.mean)} />
 				<StatRow label="Min" value={formatMicroseconds(result.min)} />
 				<StatRow label="Max" value={formatMicroseconds(result.max)} />
 				<StatRow label="Payload" value={formatBytes(result.payloadBytes)} />
-				<StatRow label="Iterations" value={result.iterations.toLocaleString()} />
+				<StatRow label="Iters" value={result.iterations.toLocaleString()} />
 			</div>
 		</div>
 	);
 }
 
-function rankResults(
-	jsonMedian: number,
-	cueMedian: number,
-	msgpackMedian: number,
-): { json: RankStatus; cue: RankStatus; msgpack: RankStatus } {
-	const entries: { key: "json" | "cue" | "msgpack"; median: number }[] = [
-		{ key: "json", median: jsonMedian },
-		{ key: "cue", median: cueMedian },
-		{ key: "msgpack", median: msgpackMedian },
-	];
-	entries.sort((a, b) => a.median - b.median);
+interface RankedEntry {
+	key: string;
+	label: string;
+	result: BenchmarkResult;
+}
 
-	const result: Record<string, RankStatus> = {};
-	result[entries[0].key] = "fastest";
-	result[entries[1].key] = "middle";
-	result[entries[2].key] = "slowest";
+function rankResults(entries: RankedEntry[]): Map<string, RankStatus> {
+	const sorted = [...entries].sort((a, b) => {
+		const aMedian = a.result.median ?? a.result.mean;
+		const bMedian = b.result.median ?? b.result.mean;
+		return aMedian - bMedian;
+	});
+	const ranks = new Map<string, RankStatus>();
+	for (let i = 0; i < sorted.length; i++) {
+		if (i === 0) {
+			ranks.set(sorted[i].key, "fastest");
+		} else if (i === sorted.length - 1) {
+			ranks.set(sorted[i].key, "slowest");
+		} else {
+			ranks.set(sorted[i].key, "neutral");
+		}
+	}
+	return ranks;
+}
 
-	return result as { json: RankStatus; cue: RankStatus; msgpack: RankStatus };
+function RatioLine({
+	label,
+	median,
+	baselineMedian,
+}: { label: string; median: number; baselineMedian: number }) {
+	const slower = median > baselineMedian;
+	const ratio = formatRatio(median, baselineMedian);
+	const equivalent = Math.abs(median - baselineMedian) < 0.01;
+
+	return (
+		<p className="text-sm text-zinc-400">
+			<span className="font-semibold text-white">{label}</span>{" "}
+			{equivalent ? (
+				<span className="font-semibold text-zinc-400">~equivalent</span>
+			) : (
+				<>
+					<span className={`font-semibold ${slower ? "text-red-400" : "text-green-400"}`}>
+						{ratio}
+					</span>{" "}
+					{slower ? "slower" : "faster"}
+				</>
+			)}
+		</p>
+	);
 }
 
 export function ResultsPanel({
 	jsonResult,
-	cueResult,
+	cueParseResult,
+	cueDeserializeTsResult,
+	cueDeserializeWasmResult,
 	msgpackResult,
 	jsonOutput,
-	cueOutput,
+	cueParseOutput,
+	cueDeserializeTsOutput,
+	cueDeserializeWasmOutput,
 	msgpackOutput,
 }: ResultsPanelProps) {
 	const [showOutput, setShowOutput] = useState(false);
 
-	if (!jsonResult || !cueResult || !msgpackResult) {
+	const hasAnyResult = jsonResult || cueParseResult || cueDeserializeTsResult || cueDeserializeWasmResult || msgpackResult;
+
+	if (!hasAnyResult) {
 		return (
 			<div className="flex h-full items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/50 p-8">
 				<p className="text-sm text-zinc-600">Run a benchmark to see results</p>
@@ -104,54 +141,58 @@ export function ResultsPanel({
 		);
 	}
 
-	const ranks = rankResults(jsonResult.median, cueResult.median, msgpackResult.median);
+	// Build list of available results
+	const entries: RankedEntry[] = [];
+	if (jsonResult) entries.push({ key: "json", label: "JSON.parse", result: jsonResult });
+	if (cueParseResult) entries.push({ key: "cueParse", label: "CUE Parse (AST)", result: cueParseResult });
+	if (cueDeserializeTsResult) entries.push({ key: "cueDeserializeTs", label: "CUE Deserialize (TS)", result: cueDeserializeTsResult });
+	if (cueDeserializeWasmResult) entries.push({ key: "cueDeserializeWasm", label: "CUE Deserialize (WASM)", result: cueDeserializeWasmResult });
+	if (msgpackResult) entries.push({ key: "msgpack", label: "MsgPack Decode", result: msgpackResult });
 
-	// Use mean as fallback when medians are both 0
-	const cueMedian = cueResult.median || cueResult.mean;
-	const jsonMedianFallback = jsonResult.median || jsonResult.mean;
-	const msgpackMedian = msgpackResult.median || msgpackResult.mean;
+	const ranks = rankResults(entries);
 
-	const cueVsJson = formatRatio(cueMedian, jsonMedianFallback);
-	const msgpackVsJson = formatRatio(msgpackMedian, jsonMedianFallback);
-	const cueVsMsgpack = formatRatio(cueMedian, msgpackMedian);
-
-	const cueSlowerThanJson = cueMedian > jsonMedianFallback;
-	const msgpackSlowerThanJson = msgpackMedian > jsonMedianFallback;
+	// Baseline for ratio summary
+	const jsonMedianFallback = jsonResult ? (jsonResult.median ?? jsonResult.mean) : 0;
 
 	return (
 		<div className="flex flex-col gap-4">
-			{/* Speed comparison summary */}
-			<div className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-4 text-center space-y-1">
-				<p className="text-sm text-zinc-400">
-					<span className="font-semibold text-white">CUE parse</span> is{" "}
-					<span className={`font-semibold ${cueSlowerThanJson ? "text-red-400" : "text-green-400"}`}>
-						{cueVsJson}
-					</span>{" "}
-					{cueSlowerThanJson ? "slower" : "faster"} than JSON.parse
-				</p>
-				<p className="text-sm text-zinc-400">
-					<span className="font-semibold text-white">MsgPack decode</span> is{" "}
-					<span className={`font-semibold ${msgpackSlowerThanJson ? "text-red-400" : "text-green-400"}`}>
-						{msgpackVsJson}
-					</span>{" "}
-					{msgpackSlowerThanJson ? "slower" : "faster"} than JSON.parse
-				</p>
-				<p className="text-sm text-zinc-400">
-					<span className="font-semibold text-white">CUE</span> vs{" "}
-					<span className="font-semibold text-white">MsgPack</span>:{" "}
-					<span className="font-semibold text-violet-400">{cueVsMsgpack}</span> difference
-				</p>
-			</div>
+			{/* Ratio summary relative to JSON.parse baseline */}
+			{jsonResult && entries.length > 1 && (
+				<div className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-4 text-center space-y-1">
+					<p className="mb-1 text-xs font-medium uppercase tracking-wider text-zinc-500">
+						Speed relative to JSON.parse
+					</p>
+					{entries
+						.filter((e) => e.key !== "json")
+						.map((e) => (
+							<RatioLine
+								key={e.key}
+								label={e.label}
+								median={e.result.median ?? e.result.mean}
+								baselineMedian={jsonMedianFallback}
+							/>
+						))}
+				</div>
+			)}
 
-			{/* Side-by-side results */}
-			<div className="grid grid-cols-3 gap-3">
-				<ResultCard title="JSON.parse" result={jsonResult} status={ranks.json} />
-				<ResultCard title="CUE Parse" result={cueResult} status={ranks.cue} />
-				<ResultCard title="MsgPack Decode" result={msgpackResult} status={ranks.msgpack} />
+			{/* Responsive grid of result cards */}
+			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+				{entries.map((e) => (
+					<ResultCard
+						key={e.key}
+						title={e.label}
+						result={e.result}
+						status={ranks.get(e.key) ?? "neutral"}
+					/>
+				))}
 			</div>
 
 			{/* Collapsible parsed output */}
-			{(jsonOutput !== undefined || cueOutput !== undefined || msgpackOutput !== undefined) && (
+			{(jsonOutput !== undefined ||
+				cueParseOutput !== undefined ||
+				cueDeserializeTsOutput !== undefined ||
+				cueDeserializeWasmOutput !== undefined ||
+				msgpackOutput !== undefined) && (
 				<div>
 					<button
 						type="button"
@@ -161,25 +202,61 @@ export function ResultsPanel({
 						{showOutput ? "Hide" : "Show"} parsed output
 					</button>
 					{showOutput && (
-						<div className="grid grid-cols-3 gap-3">
-							<div className="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
-								<p className="mb-2 text-xs font-medium text-zinc-500">JSON Parsed</p>
-								<pre className="max-h-64 overflow-auto font-mono text-xs text-zinc-400">
-									{JSON.stringify(jsonOutput, null, 2)}
-								</pre>
+						<div className="flex flex-col gap-4">
+							{/* Parsed objects group */}
+							<div>
+								<p className="mb-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
+									Parsed Objects (plain values)
+								</p>
+								<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-2">
+									{jsonOutput !== undefined && (
+										<div className="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
+											<p className="mb-2 text-xs font-medium text-zinc-500">JSON.parse</p>
+											<pre className="max-h-48 overflow-auto font-mono text-xs text-zinc-400">
+												{JSON.stringify(jsonOutput, null, 2)}
+											</pre>
+										</div>
+									)}
+									{cueDeserializeTsOutput !== undefined && (
+										<div className="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
+											<p className="mb-2 text-xs font-medium text-zinc-500">CUE Deserialize (TS)</p>
+											<pre className="max-h-48 overflow-auto font-mono text-xs text-zinc-400">
+												{JSON.stringify(cueDeserializeTsOutput, null, 2)}
+											</pre>
+										</div>
+									)}
+									{cueDeserializeWasmOutput !== undefined && (
+										<div className="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
+											<p className="mb-2 text-xs font-medium text-zinc-500">CUE Deserialize (WASM)</p>
+											<pre className="max-h-48 overflow-auto font-mono text-xs text-zinc-400">
+												{JSON.stringify(cueDeserializeWasmOutput, null, 2)}
+											</pre>
+										</div>
+									)}
+									{msgpackOutput !== undefined && (
+										<div className="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
+											<p className="mb-2 text-xs font-medium text-zinc-500">MsgPack Decoded</p>
+											<pre className="max-h-48 overflow-auto font-mono text-xs text-zinc-400">
+												{JSON.stringify(msgpackOutput, null, 2)}
+											</pre>
+										</div>
+									)}
+								</div>
 							</div>
-							<div className="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
-								<p className="mb-2 text-xs font-medium text-zinc-500">CUE AST</p>
-								<pre className="max-h-64 overflow-auto font-mono text-xs text-zinc-400">
-									{JSON.stringify(cueOutput, null, 2)}
-								</pre>
-							</div>
-							<div className="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
-								<p className="mb-2 text-xs font-medium text-zinc-500">MsgPack Decoded</p>
-								<pre className="max-h-64 overflow-auto font-mono text-xs text-zinc-400">
-									{JSON.stringify(msgpackOutput, null, 2)}
-								</pre>
-							</div>
+							{/* AST group */}
+							{cueParseOutput !== undefined && (
+								<div>
+									<p className="mb-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
+										AST Output
+									</p>
+									<div className="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
+										<p className="mb-2 text-xs font-medium text-zinc-500">CUE Parse (AST)</p>
+										<pre className="max-h-64 overflow-auto font-mono text-xs text-zinc-400">
+											{JSON.stringify(cueParseOutput, null, 2)}
+										</pre>
+									</div>
+								</div>
+							)}
 						</div>
 					)}
 				</div>

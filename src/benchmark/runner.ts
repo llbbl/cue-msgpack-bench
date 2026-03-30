@@ -1,8 +1,8 @@
-import { parse } from "cue-ts";
+import { parse, deserializeTs, deserialize } from "cue-ts";
 import { decodeMsgpack } from "./msgpack";
 
 export interface BenchmarkResult {
-	format: "cue" | "msgpack" | "json";
+	format: "cue" | "cue-deserialize-ts" | "cue-deserialize-wasm" | "msgpack" | "json";
 	iterations: number;
 	median: number;
 	mean: number;
@@ -98,4 +98,30 @@ export async function runJsonBenchmark(jsonString: string, iterations: number): 
 	const times = await runBatched(() => JSON.parse(jsonString), iterations);
 
 	return { format: "json", iterations, payloadBytes, ...calculateStats(times) };
+}
+
+export async function runCueDeserializeTsBenchmark(cueText: string, iterations: number): Promise<BenchmarkResult> {
+	const payloadBytes = new TextEncoder().encode(cueText).byteLength;
+
+	// Warm up
+	for (let i = 0; i < WARMUP_ITERATIONS; i++) {
+		deserializeTs(cueText);
+	}
+
+	const times = await runBatched(() => deserializeTs(cueText), iterations);
+
+	return { format: "cue-deserialize-ts", iterations, payloadBytes, ...calculateStats(times) };
+}
+
+export async function runCueDeserializeWasmBenchmark(cueText: string, iterations: number): Promise<BenchmarkResult> {
+	const payloadBytes = new TextEncoder().encode(cueText).byteLength;
+
+	// Warm up
+	for (let i = 0; i < WARMUP_ITERATIONS; i++) {
+		deserialize(cueText, { engine: "wasm" });
+	}
+
+	const times = await runBatched(() => deserialize(cueText, { engine: "wasm" }), iterations);
+
+	return { format: "cue-deserialize-wasm", iterations, payloadBytes, ...calculateStats(times) };
 }
