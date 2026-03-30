@@ -5,6 +5,7 @@ import { decodeMsgpack } from "./benchmark/msgpack";
 import {
 	runCueBenchmark,
 	runCueDeserializeTsBenchmark,
+	runCueFastDeserializeBenchmark,
 	runCueDeserializeWasmBenchmark,
 	runJsonBenchmark,
 	runMsgpackBenchmark,
@@ -13,7 +14,7 @@ import type { BenchmarkResult } from "./benchmark/runner";
 import { BenchmarkRunner } from "./components/BenchmarkRunner";
 import { CueInput } from "./components/CueInput";
 import { ResultsPanel } from "./components/ResultsPanel";
-import { parse, deserializeTs, deserialize, initWasm } from "cue-ts";
+import { parse, deserializeTs, fastDeserialize, deserialize, initWasm } from "cue-ts";
 
 export default function App() {
 	const [selectedExample, setSelectedExample] = useState<Example>(examples[0]);
@@ -24,11 +25,13 @@ export default function App() {
 	const [jsonResult, setJsonResult] = useState<BenchmarkResult>();
 	const [cueParseResult, setCueParseResult] = useState<BenchmarkResult>();
 	const [cueDeserializeTsResult, setCueDeserializeTsResult] = useState<BenchmarkResult>();
+	const [cueFastDeserializeResult, setCueFastDeserializeResult] = useState<BenchmarkResult>();
 	const [cueDeserializeWasmResult, setCueDeserializeWasmResult] = useState<BenchmarkResult>();
 	const [msgpackResult, setMsgpackResult] = useState<BenchmarkResult>();
 	const [jsonOutput, setJsonOutput] = useState<unknown>();
 	const [cueParseOutput, setCueParseOutput] = useState<unknown>();
 	const [cueDeserializeTsOutput, setCueDeserializeTsOutput] = useState<unknown>();
+	const [cueFastDeserializeOutput, setCueFastDeserializeOutput] = useState<unknown>();
 	const [cueDeserializeWasmOutput, setCueDeserializeWasmOutput] = useState<unknown>();
 	const [msgpackOutput, setMsgpackOutput] = useState<unknown>();
 	const [selectedExampleId, setSelectedExampleId] = useState<string | undefined>(examples[0].id);
@@ -63,6 +66,7 @@ export default function App() {
 				const jsonRes = await runJsonBenchmark(selectedExample.jsonText, iters);
 				const cueParseRes = await runCueBenchmark(cueText, iters);
 				const cueDeserializeTsRes = await runCueDeserializeTsBenchmark(cueText, iters);
+				const cueFastDeserializeRes = await runCueFastDeserializeBenchmark(cueText, iters);
 				const cueDeserializeWasmRes = wasmReady
 					? await runCueDeserializeWasmBenchmark(cueText, iters)
 					: undefined;
@@ -71,6 +75,7 @@ export default function App() {
 				setJsonResult(jsonRes);
 				setCueParseResult(cueParseRes);
 				setCueDeserializeTsResult(cueDeserializeTsRes);
+				setCueFastDeserializeResult(cueFastDeserializeRes);
 				setCueDeserializeWasmResult(cueDeserializeWasmRes);
 				setMsgpackResult(msgpackRes);
 
@@ -78,6 +83,7 @@ export default function App() {
 				setJsonOutput(JSON.parse(selectedExample.jsonText));
 				setCueParseOutput(parse(cueText));
 				setCueDeserializeTsOutput(deserializeTs(cueText));
+				setCueFastDeserializeOutput(fastDeserialize(cueText));
 				setCueDeserializeWasmOutput(
 					wasmReady ? deserialize(cueText, { engine: "wasm" }) : undefined,
 				);
@@ -95,11 +101,13 @@ export default function App() {
 		setJsonResult(undefined);
 		setCueParseResult(undefined);
 		setCueDeserializeTsResult(undefined);
+		setCueFastDeserializeResult(undefined);
 		setCueDeserializeWasmResult(undefined);
 		setMsgpackResult(undefined);
 		setJsonOutput(undefined);
 		setCueParseOutput(undefined);
 		setCueDeserializeTsOutput(undefined);
+		setCueFastDeserializeOutput(undefined);
 		setCueDeserializeWasmOutput(undefined);
 		setMsgpackOutput(undefined);
 		setError(null);
@@ -114,7 +122,7 @@ export default function App() {
 						CUE vs MessagePack vs JSON Benchmark
 					</h1>
 					<p className="mt-2 text-sm text-zinc-500">
-						Compare 5 parsing/deserialization strategies in the browser
+						Compare 6 parsing/deserialization strategies in the browser
 						{!wasmReady && (
 							<span className="ml-2 text-yellow-500">(WASM loading...)</span>
 						)}
@@ -153,11 +161,13 @@ export default function App() {
 						jsonResult={jsonResult}
 						cueParseResult={cueParseResult}
 						cueDeserializeTsResult={cueDeserializeTsResult}
+						cueFastDeserializeResult={cueFastDeserializeResult}
 						cueDeserializeWasmResult={cueDeserializeWasmResult}
 						msgpackResult={msgpackResult}
 						jsonOutput={jsonOutput}
 						cueParseOutput={cueParseOutput}
 						cueDeserializeTsOutput={cueDeserializeTsOutput}
+						cueFastDeserializeOutput={cueFastDeserializeOutput}
 						cueDeserializeWasmOutput={cueDeserializeWasmOutput}
 						msgpackOutput={msgpackOutput}
 					/>

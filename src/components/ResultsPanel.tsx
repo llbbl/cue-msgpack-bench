@@ -6,11 +6,13 @@ interface ResultsPanelProps {
 	jsonResult?: BenchmarkResult;
 	cueParseResult?: BenchmarkResult;
 	cueDeserializeTsResult?: BenchmarkResult;
+	cueFastDeserializeResult?: BenchmarkResult;
 	cueDeserializeWasmResult?: BenchmarkResult;
 	msgpackResult?: BenchmarkResult;
 	jsonOutput?: unknown;
 	cueParseOutput?: unknown;
 	cueDeserializeTsOutput?: unknown;
+	cueFastDeserializeOutput?: unknown;
 	cueDeserializeWasmOutput?: unknown;
 	msgpackOutput?: unknown;
 }
@@ -121,17 +123,19 @@ export function ResultsPanel({
 	jsonResult,
 	cueParseResult,
 	cueDeserializeTsResult,
+	cueFastDeserializeResult,
 	cueDeserializeWasmResult,
 	msgpackResult,
 	jsonOutput,
 	cueParseOutput,
 	cueDeserializeTsOutput,
+	cueFastDeserializeOutput,
 	cueDeserializeWasmOutput,
 	msgpackOutput,
 }: ResultsPanelProps) {
 	const [showOutput, setShowOutput] = useState(false);
 
-	const hasAnyResult = jsonResult || cueParseResult || cueDeserializeTsResult || cueDeserializeWasmResult || msgpackResult;
+	const hasAnyResult = jsonResult || cueParseResult || cueDeserializeTsResult || cueFastDeserializeResult || cueDeserializeWasmResult || msgpackResult;
 
 	if (!hasAnyResult) {
 		return (
@@ -146,6 +150,7 @@ export function ResultsPanel({
 	if (jsonResult) entries.push({ key: "json", label: "JSON.parse", result: jsonResult });
 	if (cueParseResult) entries.push({ key: "cueParse", label: "CUE Parse (AST)", result: cueParseResult });
 	if (cueDeserializeTsResult) entries.push({ key: "cueDeserializeTs", label: "CUE Deserialize (TS)", result: cueDeserializeTsResult });
+	if (cueFastDeserializeResult) entries.push({ key: "cueFastDeserialize", label: "CUE Fast Deserialize", result: cueFastDeserializeResult });
 	if (cueDeserializeWasmResult) entries.push({ key: "cueDeserializeWasm", label: "CUE Deserialize (WASM)", result: cueDeserializeWasmResult });
 	if (msgpackResult) entries.push({ key: "msgpack", label: "MsgPack Decode", result: msgpackResult });
 
@@ -191,6 +196,7 @@ export function ResultsPanel({
 			{(jsonOutput !== undefined ||
 				cueParseOutput !== undefined ||
 				cueDeserializeTsOutput !== undefined ||
+				cueFastDeserializeOutput !== undefined ||
 				cueDeserializeWasmOutput !== undefined ||
 				msgpackOutput !== undefined) && (
 				<div>
@@ -222,6 +228,14 @@ export function ResultsPanel({
 											<p className="mb-2 text-xs font-medium text-zinc-500">CUE Deserialize (TS)</p>
 											<pre className="max-h-48 overflow-auto font-mono text-xs text-zinc-400">
 												{JSON.stringify(cueDeserializeTsOutput, null, 2)}
+											</pre>
+										</div>
+									)}
+									{cueFastDeserializeOutput !== undefined && (
+										<div className="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
+											<p className="mb-2 text-xs font-medium text-zinc-500">CUE Fast Deserialize</p>
+											<pre className="max-h-48 overflow-auto font-mono text-xs text-zinc-400">
+												{JSON.stringify(cueFastDeserializeOutput, null, 2)}
 											</pre>
 										</div>
 									)}
