@@ -31,7 +31,7 @@
 		"tailwindcss": "^4.1.4",
 		"typescript": "~5.9.3",
 		"vite": "^8.0.1",
-		"vitest": "^3.2.1"
+		"vitest": "^4.1.0"
 	},
 	"author": "Logan Lindquist Land",
 	"license": "Apache-2.0",
